@@ -85,7 +85,7 @@ if (isset($_SESSION['user_id'])) {
                         <h4>Register</h4>
                     </div>
                     <div class="card-body">
-                        <!-- NOTE: no action attribute, handled by register.js -->
+                        <!-- Fixed: Form ID matches JavaScript selector -->
                         <form method="POST" class="mt-4" id="registerForm">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name <i class="fa fa-user"></i></label>
@@ -98,6 +98,7 @@ if (isset($_SESSION['user_id'])) {
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password <i class="fa fa-lock"></i></label>
                                 <input type="password" class="form-control animate__animated animate__fadeInUp" id="password" name="password" required>
+                                <div class="form-text">Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="country" class="form-label">Country <i class="fa fa-flag"></i></label>

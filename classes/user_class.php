@@ -52,16 +52,43 @@ class User extends db_connection
      */
     public function register($name, $email, $password, $country, $city, $contact, $role = 2, $image = null)
     {
-        // hash password before saving
-        $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
+        try {
+            // hash password before saving
+            $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
+            
+            // Ensure connection exists
+            if ($this->db === null) {
+                $this->db_connect();
+            }
+            
+            // Escape strings to prevent SQL injection
+            $name = mysqli_real_escape_string($this->db, $name);
+            $email = mysqli_real_escape_string($this->db, $email);
+            $hashed_pass = mysqli_real_escape_string($this->db, $hashed_pass);
+            $country = mysqli_real_escape_string($this->db, $country);
+            $city = mysqli_real_escape_string($this->db, $city);
+            $contact = mysqli_real_escape_string($this->db, $contact);
 
-        $sql = "INSERT INTO customer 
-                (customer_name, customer_email, customer_pass, customer_country, customer_city, customer_contact, customer_image, user_role)
-                VALUES 
-                ('$name', '$email', '$hashed_pass', '$country', '$city', '$contact', " . 
-                (is_null($image) ? "NULL" : "'$image'") . ", '$role')";
+            $sql = "INSERT INTO customer 
+                    (customer_name, customer_email, customer_pass, customer_country, customer_city, customer_contact, customer_image, user_role)
+                    VALUES 
+                    ('$name', '$email', '$hashed_pass', '$country', '$city', '$contact', " . 
+                    (is_null($image) ? "NULL" : "'$image'") . ", '$role')";
 
-        return $this->db_write_query($sql);
+            $result = $this->db_write_query($sql);
+            
+            if ($result) {
+                error_log("User registered successfully: $email");
+                return true;
+            } else {
+                error_log("Registration failed for: $email");
+                return false;
+            }
+            
+        } catch (Exception $e) {
+            error_log("Registration error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -69,8 +96,21 @@ class User extends db_connection
      */
     public function checkEmail($email)
     {
-        $sql = "SELECT * FROM customer WHERE customer_email = '$email'";
-        return $this->db_fetch_one($sql);  // returns record if found, false if not
+        try {
+            // Ensure connection exists
+            if ($this->db === null) {
+                $this->db_connect();
+            }
+            
+            $email = mysqli_real_escape_string($this->db, $email);
+            $sql = "SELECT * FROM customer WHERE customer_email = '$email'";
+            $result = $this->db_fetch_one($sql);
+            
+            return $result !== false; // returns true if email exists, false if not
+        } catch (Exception $e) {
+            error_log("Error checking email: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
@@ -78,6 +118,12 @@ class User extends db_connection
      */
     public function getUser($id)
     {
+        // Ensure connection exists
+        if ($this->db === null) {
+            $this->db_connect();
+        }
+        
+        $id = mysqli_real_escape_string($this->db, $id);
         $sql = "SELECT * FROM customer WHERE customer_id = '$id'";
         return $this->db_fetch_one($sql);
     }
@@ -96,15 +142,27 @@ class User extends db_connection
      */
     public function deleteUser($id)
     {
+        // Ensure connection exists
+        if ($this->db === null) {
+            $this->db_connect();
+        }
+        
+        $id = mysqli_real_escape_string($this->db, $id);
         $sql = "DELETE FROM customer WHERE customer_id = '$id'";
         return $this->db_write_query($sql);
     }
 
     /**
-     *Get user by email (for login)
+     * Get user by email (for login)
      */
     public function getUserByEmail($email)
     {
+        // Ensure connection exists
+        if ($this->db === null) {
+            $this->db_connect();
+        }
+        
+        $email = mysqli_real_escape_string($this->db, $email);
         $sql = "SELECT * FROM customer WHERE customer_email = '$email'";
         return $this->db_fetch_one($sql);
     }

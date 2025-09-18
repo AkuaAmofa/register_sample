@@ -6,8 +6,15 @@ require_once '../classes/user_class.php';
  */
 function register_user_ctr($name, $email, $password, $country, $city, $contact, $role = 2, $image = null)
 {
-    $user = new User();
-    return $user->register($name, $email, $password, $country, $city, $contact, $role, $image);
+    try {
+        $user = new User();
+        $result = $user->register($name, $email, $password, $country, $city, $contact, $role, $image);
+        error_log("Controller: Registration result for $email: " . ($result ? 'success' : 'failed'));
+        return $result;
+    } catch (Exception $e) {
+        error_log("Controller error in register_user_ctr: " . $e->getMessage());
+        return false;
+    }
 }
 
 /**
@@ -15,8 +22,15 @@ function register_user_ctr($name, $email, $password, $country, $city, $contact, 
  */
 function check_email_ctr($email)
 {
-    $user = new User();
-    return $user->checkEmail($email);
+    try {
+        $user = new User();
+        $result = $user->checkEmail($email);
+        error_log("Controller: Email check for $email: " . ($result ? 'exists' : 'available'));
+        return $result;
+    } catch (Exception $e) {
+        error_log("Controller error in check_email_ctr: " . $e->getMessage());
+        throw $e;
+    }
 }
 
 /**
@@ -24,8 +38,13 @@ function check_email_ctr($email)
  */
 function get_user_ctr($id)
 {
-    $user = new User();
-    return $user->getUser($id);
+    try {
+        $user = new User();
+        return $user->getUser($id);
+    } catch (Exception $e) {
+        error_log("Controller error in get_user_ctr: " . $e->getMessage());
+        return false;
+    }
 }
 
 /**
@@ -33,8 +52,13 @@ function get_user_ctr($id)
  */
 function get_all_users_ctr()
 {
-    $user = new User();
-    return $user->getAllUsers();
+    try {
+        $user = new User();
+        return $user->getAllUsers();
+    } catch (Exception $e) {
+        error_log("Controller error in get_all_users_ctr: " . $e->getMessage());
+        return false;
+    }
 }
 
 /**
@@ -42,8 +66,13 @@ function get_all_users_ctr()
  */
 function delete_user_ctr($id)
 {
-    $user = new User();
-    return $user->deleteUser($id);
+    try {
+        $user = new User();
+        return $user->deleteUser($id);
+    } catch (Exception $e) {
+        error_log("Controller error in delete_user_ctr: " . $e->getMessage());
+        return false;
+    }
 }
 
 /**
@@ -51,8 +80,12 @@ function delete_user_ctr($id)
  */
 function login_user_ctr($email)
 {
-    $user = new User();
-    return $user->getUserByEmail($email);
+    try {
+        $user = new User();
+        return $user->getUserByEmail($email);
+    } catch (Exception $e) {
+        error_log("Controller error in login_user_ctr: " . $e->getMessage());
+        return false;
+    }
 }
 ?>
-
