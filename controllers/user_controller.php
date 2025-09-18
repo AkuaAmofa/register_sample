@@ -45,5 +45,14 @@ function delete_user_ctr($id)
     $user = new User();
     return $user->deleteUser($id);
 }
+
+/**
+ * Login user by email (for login functionality)
+ */
+function login_user_ctr($email)
+{
+    $user = new User();
+    return $user->getUserByEmail($email);
+}
 ?>
 

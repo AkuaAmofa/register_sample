@@ -99,5 +99,14 @@ class User extends db_connection
         $sql = "DELETE FROM customer WHERE customer_id = '$id'";
         return $this->db_write_query($sql);
     }
+
+    /**
+     *Get user by email (for login)
+     */
+    public function getUserByEmail($email)
+    {
+        $sql = "SELECT * FROM customer WHERE customer_email = '$email'";
+        return $this->db_fetch_one($sql);
+    }
 }
 ?>
