@@ -7,7 +7,7 @@ $response = [];
 // Debug: Log incoming POST data
 error_log("POST data: " . print_r($_POST, true));
 
-// 🔹 Prevent registration if already logged in
+// Prevent registration if already logged in
 if (isset($_SESSION['user_id'])) {
     $response['status']  = 'error';
     $response['message'] = 'You are already logged in';
@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id'])) {
 
 require_once '../controllers/user_controller.php';
 
-// 🔹 Collect form data safely
+// Collect form data safely
 $name     = isset($_POST['name']) ? trim($_POST['name']) : '';
 $email    = isset($_POST['email']) ? trim($_POST['email']) : '';
 $password = isset($_POST['password']) ? $_POST['password'] : '';
@@ -30,7 +30,7 @@ $image    = null; // optional
 // Debug: Log processed data
 error_log("Processed data - Name: $name, Email: $email, Country: $country, City: $city, Contact: $contact, Role: $role");
 
-// 🔹 Step 1: Validate required fields
+//Step 1: Validate required fields
 if (empty($name) || empty($email) || empty($password) || empty($country) || empty($city) || empty($contact)) {
     $response['status']  = 'error';
     $response['message'] = 'All fields are required';
@@ -46,7 +46,7 @@ if (empty($name) || empty($email) || empty($password) || empty($country) || empt
     exit();
 }
 
-// 🔹 Step 2: Validate email format
+// Step 2: Validate email format
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $response['status']  = 'error';
     $response['message'] = 'Invalid email format';
@@ -54,7 +54,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
-// 🔹 Step 3: Check if email already exists
+// Step 3: Check if email already exists
 try {
     if (check_email_ctr($email)) {
         $response['status']  = 'error';
@@ -70,7 +70,7 @@ try {
     exit();
 }
 
-// 🔹 Step 4: Attempt registration
+// Step 4: Attempt registration
 try {
     $result = register_user_ctr($name, $email, $password, $country, $city, $contact, $role, $image);
     

@@ -21,9 +21,9 @@ $files_to_check = [
 
 foreach ($files_to_check as $file) {
     if (file_exists($file)) {
-        echo "✅ $file exists<br>";
+        echo "$file exists<br>";
     } else {
-        echo "❌ $file NOT FOUND<br>";
+        echo "$file NOT FOUND<br>";
     }
 }
 
@@ -31,23 +31,23 @@ foreach ($files_to_check as $file) {
 echo "<h4>2. Controller Include Test:</h4>";
 try {
     require_once '../controllers/user_controller.php';
-    echo "✅ Controller included successfully<br>";
+    echo " Controller included successfully<br>";
 } catch (Exception $e) {
-    echo "❌ Controller include failed: " . $e->getMessage() . "<br>";
+    echo " Controller include failed: " . $e->getMessage() . "<br>";
 }
 
 // Test 3: Check if functions exist
 echo "<h4>3. Function Existence Check:</h4>";
 if (function_exists('register_user_ctr')) {
-    echo "✅ register_user_ctr function exists<br>";
+    echo " register_user_ctr function exists<br>";
 } else {
-    echo "❌ register_user_ctr function NOT FOUND<br>";
+    echo " register_user_ctr function NOT FOUND<br>";
 }
 
 if (function_exists('check_email_ctr')) {
-    echo "✅ check_email_ctr function exists<br>";
+    echo "check_email_ctr function exists<br>";
 } else {
-    echo "❌ check_email_ctr function NOT FOUND<br>";
+    echo "check_email_ctr function NOT FOUND<br>";
 }
 
 // Test 4: Database connection test
@@ -56,9 +56,9 @@ try {
     require_once '../settings/db_class.php';
     $db = new db_connection();
     $db->db_connect();
-    echo "✅ Database connection successful<br>";
+    echo " Database connection successful<br>";
 } catch (Exception $e) {
-    echo "❌ Database connection failed: " . $e->getMessage() . "<br>";
+    echo " Database connection failed: " . $e->getMessage() . "<br>";
 }
 
 // Test 5: POST data check
