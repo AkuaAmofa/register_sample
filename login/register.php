@@ -1,6 +1,12 @@
+<?php
+session_start();
+if (isset($_SESSION['user_id'])) {
+    header("Location: ../index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Register - Taste of Africa</title>
@@ -14,26 +20,19 @@
             color: #fff;
             transition: background-color 0.3s, border-color 0.3s;
         }
-
         .btn-custom:hover {
             background-color: #b77a7a;
             border-color: #b77a7a;
         }
-
         .highlight {
             color: #D19C97;
             transition: color 0.3s;
         }
-
         .highlight:hover {
             color: #b77a7a;
         }
-
         body {
-            /* Base background color */
             background-color: #f8f9fa;
-
-            /* Gradient-like grid using repeating-linear-gradients */
             background-image:
                 repeating-linear-gradient(0deg,
                     #b77a7a,
@@ -47,81 +46,32 @@
                     transparent 20px),
                 linear-gradient(rgba(183, 122, 122, 0.1),
                     rgba(183, 122, 122, 0.1));
-
-            /* Blend the gradients for a subtle overlay effect */
             background-blend-mode: overlay;
-
-            /* Define the size of the grid */
             background-size: 20px 20px;
-
-            /* Ensure the background covers the entire viewport */
             min-height: 100vh;
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
         }
-
-        .register-container {
-            margin-top: 50px;
-        }
-
+        .register-container { margin-top: 100px; }
         .card {
             border: none;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        .card-header {
-            background-color: #D19C97;
-            color: #fff;
-        }
-
-        .custom-radio .form-check-input:checked+.form-check-label::before {
-            background-color: #D19C97;
-            border-color: #D19C97;
-        }
-
-        .form-check-label {
-            position: relative;
-            padding-left: 2rem;
-            cursor: pointer;
-        }
-
-        .form-check-label::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid #D19C97;
-            border-radius: 50%;
-            background-color: #fff;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
-        .form-check-input:focus+.form-check-label::before {
-            box-shadow: 0 0 0 0.2rem rgba(209, 156, 151, 0.5);
-        }
-
-        .animate-pulse-custom {
-            animation: pulse 2s infinite;
-        }
-
+        .card-header { background-color: #D19C97; color: #fff; }
+        .animate-pulse-custom { animation: pulse 2s infinite; }
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .form-label i { margin-left: 5px; color: #b77a7a; }
+        .alert-info { animation: fadeIn 1s; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
         }
     </style>
 </head>
@@ -135,7 +85,8 @@
                         <h4>Register</h4>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="" class="mt-4" id="register-form">
+                        <!-- NOTE: no action attribute, handled by register.js -->
+                        <form method="POST" class="mt-4" id="register-form">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name <i class="fa fa-user"></i></label>
                                 <input type="text" class="form-control animate__animated animate__fadeInUp" id="name" name="name" required>
@@ -149,19 +100,27 @@
                                 <input type="password" class="form-control animate__animated animate__fadeInUp" id="password" name="password" required>
                             </div>
                             <div class="mb-3">
-                                <label for="phone_number" class="form-label">Phone Number <i class="fa fa-phone"></i></label>
-                                <input type="text" class="form-control animate__animated animate__fadeInUp" id="phone_number" name="phone_number" required>
+                                <label for="country" class="form-label">Country <i class="fa fa-flag"></i></label>
+                                <input type="text" class="form-control animate__animated animate__fadeInUp" id="country" name="country" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">City <i class="fa fa-city"></i></label>
+                                <input type="text" class="form-control animate__animated animate__fadeInUp" id="city" name="city" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact" class="form-label">Contact Number <i class="fa fa-phone"></i></label>
+                                <input type="text" class="form-control animate__animated animate__fadeInUp" id="contact" name="contact" required>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Register As</label>
                                 <div class="d-flex justify-content-start">
                                     <div class="form-check me-3 custom-radio">
-                                        <input class="form-check-input" type="radio" name="role" id="customer" value="1" checked>
+                                        <input class="form-check-input" type="radio" name="role" id="customer" value="2" checked>
                                         <label class="form-check-label" for="customer">Customer</label>
                                     </div>
                                     <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="role" id="owner" value="2">
-                                        <label class="form-check-label" for="owner">Restaurant Owner</label>
+                                        <input class="form-check-input" type="radio" name="role" id="admin" value="1">
+                                        <label class="form-check-label" for="admin">Admin</label>
                                     </div>
                                 </div>
                             </div>
@@ -179,8 +138,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../js/register.js">
-    </script>
+    <script src="../js/register.js"></script>
 </body>
-
 </html>
