@@ -86,7 +86,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                     <div class="card-body">
                         <!-- NOTE: no action attribute, handled by register.js -->
-                        <form method="POST" class="mt-4" id="register-form">
+                        <form method="POST" class="mt-4" id="registerForm">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name <i class="fa fa-user"></i></label>
                                 <input type="text" class="form-control animate__animated animate__fadeInUp" id="name" name="name" required>
