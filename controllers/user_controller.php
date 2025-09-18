@@ -1,20 +1,49 @@
 <?php
-
 require_once '../classes/user_class.php';
 
-
-function register_user_ctr($name, $email, $password, $phone_number, $role)
+/**
+ * Handle user registration
+ */
+function register_user_ctr($name, $email, $password, $country, $city, $contact, $role = 2, $image = null)
 {
     $user = new User();
-    $user_id = $user->createUser($name, $email, $password, $phone_number, $role);
-    if ($user_id) {
-        return $user_id;
-    }
-    return false;
+    return $user->register($name, $email, $password, $country, $city, $contact, $role, $image);
 }
 
-function get_user_by_email_ctr($email)
+/**
+ * Check if email exists
+ */
+function check_email_ctr($email)
 {
     $user = new User();
-    return $user->getUserByEmail($email);
+    return $user->checkEmail($email);
 }
+
+/**
+ * Get one user by ID
+ */
+function get_user_ctr($id)
+{
+    $user = new User();
+    return $user->getUser($id);
+}
+
+/**
+ * Get all users
+ */
+function get_all_users_ctr()
+{
+    $user = new User();
+    return $user->getAllUsers();
+}
+
+/**
+ * Delete a user
+ */
+function delete_user_ctr($id)
+{
+    $user = new User();
+    return $user->deleteUser($id);
+}
+?>
+
