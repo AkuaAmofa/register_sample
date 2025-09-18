@@ -3,7 +3,7 @@
 require_once '../settings/db_class.php';
 
 /**
- * 
+ * User class handles customer-related operations
  */
 class User extends db_connection
 {
@@ -32,36 +32,72 @@ class User extends db_connection
         if (!$this->user_id) {
             return false;
         }
-        $stmt = $this->db->prepare("SELECT * FROM customer WHERE customer_id = ?");
-        $stmt->bind_param("i", $this->user_id);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
+
+        $sql = "SELECT * FROM customer WHERE customer_id = '$this->user_id'";
+        $result = $this->db_fetch_one($sql);
+
         if ($result) {
             $this->name = $result['customer_name'];
             $this->email = $result['customer_email'];
+            $this->password = $result['customer_pass'];
             $this->role = $result['user_role'];
-            $this->date_created = isset($result['date_created']) ? $result['date_created'] : null;
             $this->phone_number = $result['customer_contact'];
-        }
-    }
-
-    public function createUser($name, $email, $password, $phone_number, $role)
-    {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->db->prepare("INSERT INTO customer (customer_name, customer_email, customer_pass, customer_contact, user_role) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssi", $name, $email, $hashed_password, $phone_number, $role);
-        if ($stmt->execute()) {
-            return $this->db->insert_id;
+            return true;
         }
         return false;
     }
 
-    public function getUserByEmail($email)
+    /**
+     * Register a new customer
+     */
+    public function register($name, $email, $password, $country, $city, $contact, $role = 2, $image = null)
     {
-        $stmt = $this->db->prepare("SELECT * FROM customer WHERE customer_email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+        // hash password before saving
+        $hashed_pass = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO customer 
+                (customer_name, customer_email, customer_pass, customer_country, customer_city, customer_contact, customer_image, user_role)
+                VALUES 
+                ('$name', '$email', '$hashed_pass', '$country', '$city', '$contact', " . 
+                (is_null($image) ? "NULL" : "'$image'") . ", '$role')";
+
+        return $this->db_write_query($sql);
     }
 
+    /**
+     * Check if an email already exists
+     */
+    public function checkEmail($email)
+    {
+        $sql = "SELECT * FROM customer WHERE customer_email = '$email'";
+        return $this->db_fetch_one($sql);  // returns record if found, false if not
+    }
+
+    /**
+     * Get user by ID
+     */
+    public function getUser($id)
+    {
+        $sql = "SELECT * FROM customer WHERE customer_id = '$id'";
+        return $this->db_fetch_one($sql);
+    }
+
+    /**
+     * Get all users
+     */
+    public function getAllUsers()
+    {
+        $sql = "SELECT * FROM customer";
+        return $this->db_fetch_all($sql);
+    }
+
+    /**
+     * Delete a user
+     */
+    public function deleteUser($id)
+    {
+        $sql = "DELETE FROM customer WHERE customer_id = '$id'";
+        return $this->db_write_query($sql);
+    }
 }
+?>
