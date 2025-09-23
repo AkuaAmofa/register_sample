@@ -154,7 +154,7 @@ class User extends db_connection
     }
 
     /**
-     * Get user by email (for login)
+     * Get user by email (for login, but without password check)
      */
     public function getUserByEmail($email)
     {
@@ -165,6 +165,36 @@ class User extends db_connection
         $email = mysqli_real_escape_string($this->db, $email);
         $sql = "SELECT * FROM customer WHERE customer_email = '$email' LIMIT 1";
         return $this->db_fetch_one($sql);
+    }
+
+    /*
+     verifying email and password to login a user
+     */
+    public function login($email, $password)
+    {
+        try {
+            if ($this->db === null) {
+                $this->db_connect();
+            }
+
+            $email = mysqli_real_escape_string($this->db, $email);
+            $sql = "SELECT * FROM customer WHERE customer_email = '$email' LIMIT 1";
+            $result = $this->db_fetch_one($sql);
+
+            if ($result && isset($result['customer_pass'])) {
+                if (password_verify($password, $result['customer_pass'])) {
+                    return $result; // Successful login: return user data
+                } else {
+                    return false;  
+                }
+            }
+
+            return false; 
+
+        } catch (Exception $e) {
+            error_log("Login error: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>
