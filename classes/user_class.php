@@ -89,7 +89,7 @@ class User extends db_connection
         }
     }
 
-    /**
+    /**y
      * Check if an email already exists
      */
     public function checkEmail($email)

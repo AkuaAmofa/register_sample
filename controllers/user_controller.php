@@ -76,13 +76,13 @@ function delete_user_ctr($id)
 }
 
 /**
- * Login user by email (for login functionality)
+ * Login user by email & password (for login functionality)
  */
-function login_user_ctr($email)
+function login_user_ctr($email, $password)
 {
     try {
         $user = new User();
-        return $user->getUserByEmail($email);
+        return $user->login($email, $password); // returns user data or false
     } catch (Exception $e) {
         error_log("Controller error in login_user_ctr: " . $e->getMessage());
         return false;
