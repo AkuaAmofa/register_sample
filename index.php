@@ -35,11 +35,23 @@ $logged_in = isset($_SESSION['user_id']);
 			<a href="login/register.php" class="btn btn-sm btn-outline-primary">Register</a>
 			<a href="login/login.php" class="btn btn-sm btn-outline-secondary">Login</a>
 		<?php endif; ?>
+		<?php if ($logged_in): ?>
+			<span class="me-2">Hello, <?= htmlspecialchars($_SESSION['name']); ?>!</span>
+			<a href="login/logout.php" class="btn btn-sm btn-outline-danger">Logout</a>
+		<?php else: ?>
+			<a href="login/register.php" class="btn btn-sm btn-outline-primary">Register</a>
+			<a href="login/login.php" class="btn btn-sm btn-outline-secondary">Login</a>
+		<?php endif; ?>
 	</div>
 
 	<div class="container" style="padding-top:120px;">
 		<div class="text-center">
 			<h1>Welcome</h1>
+			<?php if ($logged_in): ?>
+				<p class="text-muted">You are logged in as <strong><?= htmlspecialchars($_SESSION['email']); ?></strong>.</p>
+			<?php else: ?>
+				<p class="text-muted">Use the menu in the top-right to Register or Login.</p>
+			<?php endif; ?>
 			<?php if ($logged_in): ?>
 				<p class="text-muted">You are logged in as <strong><?= htmlspecialchars($_SESSION['email']); ?></strong>.</p>
 			<?php else: ?>
