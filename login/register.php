@@ -98,7 +98,7 @@ if (isset($_SESSION['user_id'])) {
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password <i class="fa fa-lock"></i></label>
                                 <input type="password" class="form-control animate__animated animate__fadeInUp" id="password" name="password" required>
-                                <div class="form-text">Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number.</div>
+                                <div class="form-text">Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter,a special character, and one number.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="country" class="form-label">Country <i class="fa fa-flag"></i></label>

@@ -30,7 +30,7 @@ $image    = null; // optional
 // Debug: Log processed data
 error_log("Processed data - Name: $name, Email: $email, Country: $country, City: $city, Contact: $contact, Role: $role");
 
-//Step 1: Validate required fields
+// Step 1: Validate required fields
 if (empty($name) || empty($email) || empty($password) || empty($country) || empty($city) || empty($contact)) {
     $response['status']  = 'error';
     $response['message'] = 'All fields are required';
@@ -90,4 +90,4 @@ try {
 }
 
 echo json_encode($response);
-?>
+exit();

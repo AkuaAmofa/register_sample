@@ -1,23 +1,43 @@
-// Settings/core.php
 <?php
-session_start();
+// Settings/core.php
 
-
-//for header redirection
-ob_start();
-
-//funtion to check for login
-if (!isset($_SESSION['id'])) {
-    header("Location: ../Login/login_register.php");
-    exit;
+// Always start the session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
+// For header redirection
+ob_start();
 
-//function to get user ID
+/**
+ * Check if a user is logged in
+ * @return bool
+ */
+function isLoggedIn() {
+    return isset($_SESSION['user_id']);
+}
 
+/**
+ * Check if the logged-in user is an admin
+ * @return bool
+ */
+function isAdmin() {
+    return isLoggedIn() && isset($_SESSION['role']) && $_SESSION['role'] == 1;
+}
 
-//function to check for role (admin, customer, etc)
+/**
+ * Get the logged-in user ID
+ * @return int|null
+ */
+function getUserId() {
+    return isLoggedIn() ? $_SESSION['user_id'] : null;
+}
 
-
-
+/**
+ * Get the logged-in user name
+ * @return string|null
+ */
+function getUserName() {
+    return isLoggedIn() ? $_SESSION['name'] : null;
+}
 ?>

@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    // Fixed: Changed selector to match the actual form ID in HTML
     $('#registerForm').submit(function(e) {
         e.preventDefault();
 
@@ -7,9 +6,9 @@ $(document).ready(function() {
         var name = $('#name').val();
         var email = $('#email').val();
         var password = $('#password').val();
-        var country = $('#country').val();  // Added missing field
-        var city = $('#city').val();        // Added missing field
-        var contact = $('#contact').val();  // Fixed: was phone_number, now contact
+        var country = $('#country').val();
+        var city = $('#city').val();
+        var contact = $('#contact').val();
         var role = $('input[name="role"]:checked').val();
 
         // Validation - check all required fields
@@ -22,12 +21,18 @@ $(document).ready(function() {
             return;
         } 
         
-        // Password validation
-        if (password.length < 6 || !password.match(/[a-z]/) || !password.match(/[A-Z]/) || !password.match(/[0-9]/)) {
+        // Password validation (added special character check)
+        if (
+            password.length < 6 ||
+            !password.match(/[a-z]/) ||
+            !password.match(/[A-Z]/) ||
+            !password.match(/[0-9]/) ||
+            !password.match(/[^a-zA-Z0-9]/) //must include special character
+        ) {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Password must be at least 6 characters long and contain at least one lowercase letter, one uppercase letter, and one number!',
+                text: 'Password must be at least 6 characters long and contain one lowercase letter, one uppercase letter, one number, and one special character!',
             });
             return;
         }
@@ -36,14 +41,14 @@ $(document).ready(function() {
         $.ajax({
             url: '../actions/register_user_action.php',
             type: 'POST',
-            dataType: 'json',  // Added to ensure proper JSON parsing
+            dataType: 'json',
             data: {
                 name: name,
                 email: email,
                 password: password,
-                country: country,   // Added missing field
-                city: city,         // Added missing field
-                contact: contact,   // Fixed field name
+                country: country,
+                city: city,
+                contact: contact,
                 role: role
             },
             success: function(response) {
