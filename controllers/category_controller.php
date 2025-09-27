@@ -1,9 +1,6 @@
 <?php
 require_once '../classes/category_class.php';
 
-/**
- * Controller functions for categories
- */
 
 /**
  * Add new category
