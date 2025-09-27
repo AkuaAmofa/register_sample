@@ -1,6 +1,9 @@
 <?php
 session_start();
-$logged_in = isset($_SESSION['user_id']);
+require_once 'settings/core.php';
+
+$logged_in = isLoggedIn();
+$is_admin  = isAdmin();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,12 +31,15 @@ $logged_in = isset($_SESSION['user_id']);
 
 	<div class="menu-tray">
 		<span class="me-2">Menu:</span>
-		<?php if ($logged_in): ?>
-			<span class="me-2">Hello, <?= htmlspecialchars($_SESSION['name']); ?>!</span>
-			<a href="login/logout.php" class="btn btn-sm btn-outline-danger">Logout</a>
-		<?php else: ?>
+		<?php if (!$logged_in): ?>
 			<a href="login/register.php" class="btn btn-sm btn-outline-primary">Register</a>
 			<a href="login/login.php" class="btn btn-sm btn-outline-secondary">Login</a>
+		<?php else: ?>
+			<span class="me-2">Hello, <?= htmlspecialchars($_SESSION['name']); ?>!</span>
+			<a href="login/logout.php" class="btn btn-sm btn-outline-danger">Logout</a>
+			<?php if ($is_admin): ?>
+				<a href="admin/category.php" class="btn btn-sm btn-outline-success">Category</a>
+			<?php endif; ?>
 		<?php endif; ?>
 	</div>
 
