@@ -40,4 +40,9 @@ function getUserId() {
 function getUserName() {
     return isLoggedIn() ? $_SESSION['name'] : null;
 }
+
+// Compatibility aliases
+function is_logged_in() { return isLoggedIn(); }
+function is_admin() { return isAdmin(); }
+
 ?>

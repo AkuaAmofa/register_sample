@@ -2,12 +2,12 @@
 require_once '../settings/core.php';
 
 // Step 1: Check login and admin access
-if (!is_logged_in()) {
+if (!isLoggedIn()) {
     header("Location: ../login/login.php");
     exit();
 }
 
-if (!is_admin()) {
+if (!isAdmin()) {
     header("Location: ../index.php");
     exit();
 }

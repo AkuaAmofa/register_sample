@@ -3,25 +3,24 @@
 // Settings/db_cred.php
 
 // define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
+// define('DB_USER', 'akua.amofa');
 // define('DB_PASS', '');
-// define('DB_NAME', 'dbforlab');
+// define('DB_NAME', 'ecommerce_2025A_akua_amofa');
 
 
 if (!defined("SERVER")) {
-    define("SERVER", "localhost");
+    define("SERVER", "localhost"); 
 }
 
 if (!defined("USERNAME")) {
-    define("USERNAME", "root");
+    define("USERNAME", "akua.amofa"); 
 }
 
 if (!defined("PASSWD")) {
-    define("PASSWD", "");
+    define("PASSWD", "newsql@pass"); /
 }
 
 if (!defined("DATABASE")) {
-    // Use the database name from the provided SQL dump
-    define("DATABASE", "shoppn");
+    define("DATABASE", "ecommerce_2025A_akua_amofa"); 
 }
 ?>

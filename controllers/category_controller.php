@@ -1,9 +1,9 @@
 <?php
-require_once '../classes/category_class.php';
-
+// Ensure we can access the Category class properly in both local and server environments
+require_once dirname(__DIR__) . '/classes/category_class.php';
 
 /**
- * Add new category
+ * Add a new category
  * @param string $name
  * @return bool
  */
@@ -14,7 +14,7 @@ function add_category_ctr($name)
 }
 
 /**
- * Update category
+ * Update an existing category
  * @param int $id
  * @param string $name
  * @return bool
@@ -26,7 +26,7 @@ function update_category_ctr($id, $name)
 }
 
 /**
- * Delete category
+ * Delete a category
  * @param int $id
  * @return bool
  */
@@ -37,7 +37,7 @@ function delete_category_ctr($id)
 }
 
 /**
- * Get single category
+ * Retrieve a single category by ID
  * @param int $id
  * @return array|false
  */
@@ -48,7 +48,7 @@ function get_category_ctr($id)
 }
 
 /**
- * Get all categories
+ * Retrieve all categories
  * @return array|false
  */
 function get_all_categories_ctr()
