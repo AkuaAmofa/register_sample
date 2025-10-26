@@ -1,45 +1,27 @@
 <?php
 header('Content-Type: application/json');
 session_start();
-
+require_once '../settings/core.php';
 require_once '../controllers/brand_controller.php';
 
-$response = [];
-
-// Step 1: Check login & admin role
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
-    $response['status'] = 'error';
-    $response['message'] = 'Unauthorized access.';
-    echo json_encode($response);
-    exit();
+if (!isAdmin()) {
+    echo json_encode(['status'=>'error','message'=>'Access denied']);
+    exit;
 }
 
-// Step 2: Collect input
-$brand_name = isset($_POST['brand_name']) ? trim($_POST['brand_name']) : '';
+$name   = isset($_POST['brand_name']) ? trim($_POST['brand_name']) : '';
+$cat_id = isset($_POST['brand_cat']) ? (int)$_POST['brand_cat'] : 0;
 
-// Step 3: Validate
-if (empty($brand_name)) {
-    $response['status'] = 'error';
-    $response['message'] = 'Brand name is required.';
-    echo json_encode($response);
-    exit();
+if ($name === '' || $cat_id <= 0) {
+    echo json_encode(['status'=>'error','message'=>'Brand name and category are required']);
+    exit;
 }
 
-// Step 4: Add brand using controller
-$result = add_brand_ctr($brand_name);
+$res = add_brand_ctr($name, $cat_id);
 
-if ($result === "exists") {
-    $response['status'] = 'error';
-    $response['message'] = 'Brand name already exists.';
-} elseif ($result) {
-    $response['status'] = 'success';
-    $response['message'] = 'Brand added successfully.';
+if ($res && $res['ok']) {
+    echo json_encode(['status'=>'success','message'=>'Brand created']);
 } else {
-    $response['status'] = 'error';
-    $response['message'] = 'Failed to add brand. Try again.';
+    $msg = is_array($res) && isset($res['msg']) ? $res['msg'] : 'Failed to create brand';
+    echo json_encode(['status'=>'error','message'=>$msg]);
 }
-
-// Step 5: Send JSON response
-echo json_encode($response);
-exit();
-?>

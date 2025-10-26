@@ -1,167 +1,179 @@
-$(document).ready(function () {
+$(function () {
 
-    // Fetch brands when page loads
-    fetchBrands();
+  // cache
+  const $tbody = $('#brandTable tbody');
+  const $catSel = $('#brand_cat');
 
-    // =========================
-    // ADD BRAND
-    // =========================
-    $('#addBrandForm').submit(function (e) {
-        e.preventDefault();
+  // initial load
+  fetchAll();
 
-        let brandName = $('#brand_name').val().trim();
+  // CREATE
+  $('#addBrandForm').on('submit', function (e) {
+    e.preventDefault();
 
-        if (brandName === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Brand name cannot be empty!',
-            });
-            return;
-        }
+    const name = $('#brand_name').val().trim();
+    const cat  = parseInt($catSel.val(), 10);
 
-        $.ajax({
-            url: '../actions/add_brand_action.php',
-            type: 'POST',
-            dataType: 'json',
-            data: { brand_name: brandName },
-            success: function (response) {
-                if (response.status === 'success') {
-                    Swal.fire('Success', response.message, 'success');
-                    $('#brand_name').val('');
-                    fetchBrands(); // refresh table
-                } else {
-                    Swal.fire('Error', response.message, 'error');
-                }
-            },
-            error: function (xhr) {
-                Swal.fire('Error', 'Server error occurred!', 'error');
-                console.error(xhr.responseText);
-            }
-        });
-    });
-
-    // =========================
-    // FETCH BRANDS
-    // =========================
-    function fetchBrands() {
-        $.ajax({
-            url: '../actions/fetch_brand_action.php',
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                let tbody = $('#brandTable tbody');
-                tbody.empty();
-
-                if (response.status === 'success' && response.data.length > 0) {
-                    $.each(response.data, function (index, brand) {
-                        tbody.append(`
-                            <tr>
-                                <td>${brand.brand_id}</td>
-                                <td>${brand.brand_name}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning edit-btn" data-id="${brand.brand_id}" data-name="${brand.brand_name}"><i class="fa fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-danger delete-btn" data-id="${brand.brand_id}"><i class="fa fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                } else {
-                    tbody.append('<tr><td colspan="3" class="text-center">No brands found</td></tr>');
-                }
-            },
-            error: function (xhr) {
-                console.error('Fetch error:', xhr.responseText);
-            }
-        });
+    if (!name || !cat) {
+      Swal.fire('Error', 'Brand name and category are required.', 'error');
+      return;
     }
 
-    // =========================
-    // EDIT BRAND (SHOW MODAL)
-    // =========================
-    $(document).on('click', '.edit-btn', function () {
-        let brandId = $(this).data('id');
-        let brandName = $(this).data('name');
-
-        $('#edit_brand_id').val(brandId);
-        $('#edit_brand_name').val(brandName);
-
-        $('#editBrandModal').modal('show');
+    $.ajax({
+      url: '../actions/add_brand_action.php',
+      type: 'POST',
+      dataType: 'json',
+      data: { brand_name: name, brand_cat: cat },
+      success: (res) => {
+        if (res.status === 'success') {
+          $('#brand_name').val('');
+          fetchAll();
+          Swal.fire('Success', res.message, 'success');
+        } else {
+          Swal.fire('Error', res.message, 'error');
+        }
+      },
+      error: (xhr) => {
+        Swal.fire('Error', 'Server error occurred!', 'error');
+        console.error(xhr.responseText);
+      }
     });
+  });
 
-    // =========================
-    // UPDATE BRAND
-    // =========================
-    $('#editBrandForm').submit(function (e) {
-        e.preventDefault();
+  // EDIT -> open modal
+  $(document).on('click', '.edit-btn', function () {
+    $('#edit_brand_id').val($(this).data('id'));
+    $('#edit_brand_name').val($(this).data('name'));
+    $('#editBrandModal').modal('show');
+  });
 
-        let brandId = $('#edit_brand_id').val();
-        let newBrandName = $('#edit_brand_name').val().trim();
+  // UPDATE (name only)
+  $('#editBrandForm').on('submit', function (e) {
+    e.preventDefault();
 
-        if (newBrandName === '') {
-            Swal.fire('Error', 'Brand name cannot be empty!', 'error');
-            return;
+    const id   = $('#edit_brand_id').val();
+    const name = $('#edit_brand_name').val().trim();
+
+    if (!name) {
+      Swal.fire('Error', 'Brand name cannot be empty!', 'error');
+      return;
+    }
+
+    $.ajax({
+      url: '../actions/update_brand_action.php',
+      type: 'POST',
+      dataType: 'json',
+      data: { brand_id: id, brand_name: name },
+      success: (res) => {
+        if (res.status === 'success') {
+          $('#editBrandModal').modal('hide');
+          fetchAll();
+          Swal.fire('Updated', res.message, 'success');
+        } else {
+          Swal.fire('Error', res.message, 'error');
+        }
+      },
+      error: (xhr) => {
+        Swal.fire('Error', 'Server error occurred!', 'error');
+        console.error(xhr.responseText);
+      }
+    });
+  });
+
+  // DELETE
+  $(document).on('click', '.delete-btn', function () {
+    const id = $(this).data('id');
+
+    Swal.fire({
+      title: 'Delete this brand?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete'
+    }).then((r) => {
+      if (!r.isConfirmed) return;
+
+      $.ajax({
+        url: '../actions/delete_brand_action.php',
+        type: 'POST',
+        dataType: 'json',
+        data: { brand_id: id },
+        success: (res) => {
+          if (res.status === 'success') {
+            fetchAll();
+            Swal.fire('Deleted', res.message, 'success');
+          } else {
+            Swal.fire('Error', res.message, 'error');
+          }
+        },
+        error: (xhr) => {
+          Swal.fire('Error', 'Server error occurred!', 'error');
+          console.error(xhr.responseText);
+        }
+      });
+    });
+  });
+
+  // RETRIEVE both brands + categories
+  function fetchAll() {
+    $.ajax({
+      url: '../actions/fetch_brand_action.php',
+      type: 'GET',
+      dataType: 'json',
+      success: (res) => {
+        if (res.status !== 'success') {
+          Swal.fire('Error', res.message || 'Failed to load', 'error');
+          return;
         }
 
-        $.ajax({
-            url: '../actions/update_brand_action.php',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                brand_id: brandId,
-                brand_name: newBrandName
-            },
-            success: function (response) {
-                if (response.status === 'success') {
-                    Swal.fire('Updated', response.message, 'success');
-                    $('#editBrandModal').modal('hide');
-                    fetchBrands(); // refresh table
-                } else {
-                    Swal.fire('Error', response.message, 'error');
-                }
-            },
-            error: function (xhr) {
-                Swal.fire('Error', 'Server error occurred!', 'error');
-                console.error(xhr.responseText);
-            }
-        });
-    });
+        const brands = res.data.brands || [];
+        const cats   = res.data.categories || [];
 
-    // =========================
-    // DELETE BRAND
-    // =========================
-    $(document).on('click', '.delete-btn', function () {
-        let brandId = $(this).data('id');
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "This will permanently delete the brand.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '../actions/delete_brand_action.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: { brand_id: brandId },
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire('Deleted!', response.message, 'success');
-                            fetchBrands();
-                        } else {
-                            Swal.fire('Error', response.message, 'error');
-                        }
-                    },
-                    error: function (xhr) {
-                        Swal.fire('Error', 'Server error occurred!', 'error');
-                        console.error(xhr.responseText);
-                    }
-                });
-            }
+        // fill category select
+        $catSel.empty().append('<option value="">-- Select category --</option>');
+        cats.forEach(c => {
+          $catSel.append(`<option value="${c.cat_id}">${c.cat_name}</option>`);
         });
+
+        // table rows grouped by category (simple: sorted + separators)
+        $tbody.empty();
+        if (!brands.length) {
+          $tbody.append('<tr><td colspan="4" class="text-center">No brands yet</td></tr>');
+          return;
+        }
+
+        let lastCat = '__NONE__';
+        brands.forEach(b => {
+          const catLabel = b.cat_name || 'Uncategorised';
+          if (catLabel !== lastCat) {
+            $tbody.append(
+              `<tr class="table-light">
+                 <td colspan="4"><strong>${catLabel}</strong></td>
+               </tr>`
+            );
+            lastCat = catLabel;
+          }
+
+          $tbody.append(
+            `<tr>
+               <td>${b.brand_id}</td>
+               <td>${b.brand_name}</td>
+               <td>${catLabel}</td>
+               <td>
+                 <button class="btn btn-sm btn-warning edit-btn" data-id="${b.brand_id}" data-name="${b.brand_name}">
+                   <i class="fa fa-edit"></i>
+                 </button>
+                 <button class="btn btn-sm btn-danger delete-btn" data-id="${b.brand_id}">
+                   <i class="fa fa-trash"></i>
+                 </button>
+               </td>
+             </tr>`
+          );
+        });
+      },
+      error: (xhr) => {
+        Swal.fire('Error', 'Server error occurred!', 'error');
+        console.error(xhr.responseText);
+      }
     });
+  }
 });

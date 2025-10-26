@@ -1,59 +1,63 @@
 <?php
-require_once '../settings/db_class.php';
+// classes/brand_class.php
+require_once dirname(__DIR__) . '/classes/db_class.php';
+
 
 class Brand extends db_connection
 {
-    // ADD brand (CREATE)
-    public function addBrand($brand_name)
-    {
-        if ($this->db === null) $this->db_connect();
-        $brand_name = mysqli_real_escape_string($this->db, $brand_name);
+    public function __construct() {
+        $this->db_connect();
+    }
 
-        // Ensure unique brand name
-        $check_sql = "SELECT * FROM brands WHERE brand_name = '$brand_name'";
-        $exists = $this->db_fetch_one($check_sql);
-        if ($exists) {
-            return "exists";
-        }
+    // CREATE
+    public function addBrand($name, $cat_id) {
+        $name = mysqli_real_escape_string($this->db, trim($name));
+        $cat  = (int)$cat_id;
 
-        $sql = "INSERT INTO brands (brand_name) VALUES ('$brand_name')";
+        // enforce uniqueness at code-level too (index also enforces)
+        $check = $this->db_fetch_one(
+            "SELECT brand_id FROM brands WHERE brand_cat = $cat AND brand_name = '$name' LIMIT 1"
+        );
+        if ($check) return ['ok'=>false,'msg'=>'Brand already exists in this category'];
+
+        $sql = "INSERT INTO brands (brand_cat, brand_name) VALUES ($cat, '$name')";
+        return $this->db_write_query($sql)
+            ? ['ok'=>true,'id'=>$this->last_insert_id()]
+            : ['ok'=>false,'msg'=>'DB insert failed'];
+    }
+
+    // RETRIEVE (flat with category name, ordered by category then name)
+    public function getAllBrandsWithCategory() {
+        $sql = "SELECT b.brand_id, b.brand_name, b.brand_cat, c.cat_name
+                FROM brands b
+                LEFT JOIN categories c ON c.cat_id = b.brand_cat
+                ORDER BY c.cat_name IS NULL, c.cat_name, b.brand_name";
+        return $this->db_fetch_all($sql) ?: [];
+    }
+
+    // UPDATE (name only, per spec)
+    public function updateBrand($id, $new_name) {
+        $id   = (int)$id;
+        $name = mysqli_real_escape_string($this->db, trim($new_name));
+
+        // get current category to re-check uniqueness
+        $curr = $this->db_fetch_one("SELECT brand_cat FROM brands WHERE brand_id=$id");
+        if (!$curr) return false;
+
+        $cat  = (int)$curr['brand_cat'];
+        $dup  = $this->db_fetch_one(
+          "SELECT brand_id FROM brands WHERE brand_cat=$cat AND brand_name='$name' AND brand_id<>$id LIMIT 1"
+        );
+        if ($dup) return false;
+
+        $sql = "UPDATE brands SET brand_name='$name' WHERE brand_id=$id";
         return $this->db_write_query($sql);
     }
 
-    // GET all brands (READ)
-    public function getAllBrands()
-    {
-        $sql = "SELECT * FROM brands ORDER BY brand_name ASC";
-        return $this->db_fetch_all($sql);
-    }
-
-    // UPDATE brand
-    public function updateBrand($brand_id, $brand_name)
-    {
-        if ($this->db === null) $this->db_connect();
-        $brand_id = (int)$brand_id;
-        $brand_name = mysqli_real_escape_string($this->db, $brand_name);
-
-        $sql = "UPDATE brands SET brand_name='$brand_name' WHERE brand_id=$brand_id";
+    // DELETE
+    public function deleteBrand($id) {
+        $id = (int)$id;
+        $sql = "DELETE FROM brands WHERE brand_id=$id";
         return $this->db_write_query($sql);
-    }
-
-    // DELETE brand
-    public function deleteBrand($brand_id)
-    {
-        if ($this->db === null) $this->db_connect();
-        $brand_id = (int)$brand_id;
-
-        $sql = "DELETE FROM brands WHERE brand_id=$brand_id";
-        return $this->db_write_query($sql);
-    }
-
-    // GET single brand by ID
-    public function getBrandById($brand_id)
-    {
-        $brand_id = (int)$brand_id;
-        $sql = "SELECT * FROM brands WHERE brand_id=$brand_id";
-        return $this->db_fetch_one($sql);
     }
 }
-?>

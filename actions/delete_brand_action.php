@@ -1,42 +1,46 @@
 <?php
+// delete_brand_action.php
 header('Content-Type: application/json');
 session_start();
 
+require_once '../settings/core.php';
 require_once '../controllers/brand_controller.php';
 
-$response = [];
-
-// Step 1: Check if user is logged in and is admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
-    $response['status'] = 'error';
-    $response['message'] = 'Unauthorized access.';
-    echo json_encode($response);
+// Step 1: Access control (Admins only)
+if (!isAdmin()) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Access denied. Only admins can delete brands.'
+    ]);
     exit();
 }
 
 // Step 2: Collect input
-$brand_id = isset($_POST['brand_id']) ? intval($_POST['brand_id']) : 0;
+$id = isset($_POST['brand_id']) ? (int)$_POST['brand_id'] : 0;
 
-// Step 3: Validate
-if ($brand_id <= 0) {
-    $response['status'] = 'error';
-    $response['message'] = 'Invalid brand ID.';
-    echo json_encode($response);
+// Step 3: Validate input
+if ($id <= 0) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Invalid brand ID.'
+    ]);
     exit();
 }
 
-// Step 4: Delete brand
-$result = delete_brand_ctr($brand_id);
+// Step 4: Delete operation
+$result = delete_brand_ctr($id);
 
+// Step 5: Respond
 if ($result) {
-    $response['status'] = 'success';
-    $response['message'] = 'Brand deleted successfully.';
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Brand deleted successfully.'
+    ]);
 } else {
-    $response['status'] = 'error';
-    $response['message'] = 'Failed to delete brand. Please try again.';
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Failed to delete brand. It may not exist or a server error occurred.'
+    ]);
 }
-
-// Step 5: Return JSON response
-echo json_encode($response);
 exit();
 ?>

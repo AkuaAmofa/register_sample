@@ -1,31 +1,27 @@
 <?php
 header('Content-Type: application/json');
 session_start();
-
+require_once '../settings/core.php';
 require_once '../controllers/brand_controller.php';
+require_once '../controllers/category_controller.php'; // to fetch categories
 
-$response = [];
-
-// Step 1: Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    $response['status'] = 'error';
-    $response['message'] = 'Unauthorized access. Please log in.';
-    echo json_encode($response);
-    exit();
+if (!isAdmin()) {
+    echo json_encode(['status'=>'error','message'=>'Access denied']);
+    exit;
 }
 
-// Step 2: Fetch all brands
+/**
+ * Return both:
+ *  - brands (flat list with brand_cat & cat_name)
+ *  - categories (id+name) to populate the dropdown
+ */
 $brands = get_all_brands_ctr();
+$cats   = get_all_categories_ctr();
 
-if ($brands) {
-    $response['status'] = 'success';
-    $response['data'] = $brands;
-} else {
-    $response['status'] = 'error';
-    $response['message'] = 'No brands found or database error.';
-}
-
-// Step 3: Return JSON
-echo json_encode($response);
-exit();
-?>
+echo json_encode([
+    'status' => 'success',
+    'data'   => [
+        'brands'     => $brands ?: [],
+        'categories' => $cats   ?: []
+    ]
+]);
