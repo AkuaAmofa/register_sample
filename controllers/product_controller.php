@@ -1,6 +1,5 @@
 <?php
-// controllers/product_controller.php
-include_once dirname(__DIR__) . '/classes/product_class.php';
+require_once dirname(__DIR__) . '/classes/product_controller.php';
 
 /**
  * Add a new product

@@ -1,6 +1,7 @@
 <?php
 // classes/category_class.php
-require_once dirname(__DIR__) . '/classes/db_class.php';
+require_once dirname(__DIR__) . '/settings/db_class.php';
+
 
 class Category extends db_connection
 {

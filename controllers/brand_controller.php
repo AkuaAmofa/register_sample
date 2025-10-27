@@ -1,5 +1,6 @@
 <?php
-require_once '../classes/brand_class.php';
+// controllers/brand_controller.php
+require_once dirname(__DIR__) . '/classes/brand_class.php';
 
 function add_brand_ctr($name, $cat_id) {
     $b = new Brand();
@@ -20,3 +21,4 @@ function delete_brand_ctr($id) {
     $b = new Brand();
     return $b->deleteBrand($id);
 }
+?>

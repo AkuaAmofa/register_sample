@@ -1,6 +1,5 @@
 <?php
-// classes/brand_class.php
-require_once dirname(__DIR__) . '/classes/db_class.php';
+require_once dirname(__DIR__) . '/settings/db_class.php';
 
 
 class Brand extends db_connection

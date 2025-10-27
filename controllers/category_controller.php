@@ -1,5 +1,5 @@
 <?php
-// Ensure we can access the Category class properly in both local and server environments
+// controllers/category_controller.php
 require_once dirname(__DIR__) . '/classes/category_class.php';
 
 /**

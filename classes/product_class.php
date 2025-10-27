@@ -1,6 +1,5 @@
 <?php
-// classes/product_class.php
-include_once dirname(__DIR__) . '/settings/db_class.php';
+require_once dirname(__DIR__) . '/settings/db_class.php';
 
 class product_class extends db_connection
 {
