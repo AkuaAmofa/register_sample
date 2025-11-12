@@ -49,11 +49,11 @@ $brands     = get_all_brands_ctr();
           </li>
         <?php endif; ?>
 
-        <li class="nav-item"><a class="nav-link" href="customer/all_product.php">All Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="view/all_product.php">All Products</a></li>
       </ul>
 
       <!-- Search form -->
-      <form class="d-flex" role="search" action="customer/product_search_result.php" method="get">
+      <form class="d-flex" role="search" action="view/product_search_result.php" method="get">
         <input class="form-control me-2" type="search" name="q" placeholder="Search products..." aria-label="Search">
         <button class="btn btn-outline-primary" type="submit">Search</button>
       </form>
@@ -64,7 +64,7 @@ $brands     = get_all_brands_ctr();
 <!-- Quick Filters -->
 <div class="bg-white border-bottom">
   <div class="container py-2">
-    <form class="row g-2" action="customer/product_search_result.php" method="get">
+    <form class="row g-2" action="view/product_search_result.php" method="get">
       <div class="col-md-5 col-sm-12">
         <select name="cat" class="form-select">
           <option value="">Filter by Category</option>

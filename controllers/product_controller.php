@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . '/classes/product_controller.php';
+require_once dirname(__DIR__) . '/classes/product_class.php';
 
 /**
  * Add a new product
