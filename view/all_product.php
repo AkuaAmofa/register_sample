@@ -17,6 +17,7 @@ $brands = get_all_brands_ctr();
   <div class="container py-4">
     <h2 class="text-center mb-4">All Products</h2>
 
+    <!-- Filters -->
     <div class="row g-2 mb-3">
       <div class="col-md-3">
         <input type="text" id="searchBox" class="form-control" placeholder="Search products...">
@@ -48,8 +49,10 @@ $brands = get_all_brands_ctr();
       </div>
     </div>
 
+    <!-- Products grid -->
     <div id="productGrid" class="row g-4"></div>
 
+    <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-4">
       <button id="prevPage" class="btn btn-outline-secondary">Prev</button>
       <div id="pageInfo" class="small text-muted"></div>
@@ -73,7 +76,6 @@ $(function(){
     params.set('page', page);
     params.set('per_page', perPage);
 
-    // Composite search if any filter present; otherwise list all
     if (q || cat || brand || minP || maxP) {
       params.set('action', 'search_advanced');
       if (q) params.set('q', q);
@@ -90,7 +92,7 @@ $(function(){
   function loadProducts() {
     $.getJSON(buildActionUrl(), function(payload){
       if (!payload || payload.status === 'error') {
-        $('#productGrid').html('<p class="text-center text-muted mt-5">' + (payload?.message || 'No products') + '</p>');
+        $('#productGrid').html('<p class="text-center text-muted mt-5">' + (payload?.message || 'No products found') + '</p>');
         $('#pageInfo').text('');
         return;
       }
@@ -119,7 +121,7 @@ $(function(){
             <p class="fw-bold mb-3">GHS ${parseFloat(p.product_price).toFixed(2)}</p>
             <div class="mt-auto">
               <a href="single_product.php?id=${p.product_id}" class="btn btn-sm btn-primary w-100 mb-2">View Details</a>
-              <button class="btn btn-sm btn-outline-success w-100" data-id="${p.product_id}">Add to Cart</button>
+              <button class="btn btn-sm btn-outline-success w-100 addToCart" data-id="${p.product_id}">Add to Cart</button>
             </div>
           </div>
         </div>
@@ -136,7 +138,7 @@ $(function(){
     $('#nextPage').prop('disabled', payload.page >= pages);
   }
 
-  // events
+  // Filter and pagination controls
   $('#applyFilters').on('click', function(){ page = 1; loadProducts(); });
   $('#searchBox').on('keyup', function(e){
     if (e.key === 'Enter') { page = 1; loadProducts(); }
@@ -145,7 +147,35 @@ $(function(){
   $('#prevPage').on('click', function(){ if (page > 1) { page--; loadProducts(); } });
   $('#nextPage').on('click', function(){ page++; loadProducts(); });
 
-  // initial
+  // Add to Cart event (redirect to cart on success)
+  $(document).on('click', '.addToCart', async function() {
+    const p_id = $(this).data('id');
+    if (!p_id) return alert('Invalid product ID');
+
+    try {
+      const res  = await fetch('../actions/cart_add_action.php', {
+        method: 'POST',
+        body: new URLSearchParams({ p_id, qty: 1 })
+      });
+
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch { return alert('Server returned non-JSON:\n' + text); }
+
+      if (data.status === 'success') {
+        // we are already in /view/, so relative link is fine
+        window.location.href = 'cart.php?added=1';
+      } else {
+        alert(data.message || 'Could not add item.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error. Try again.');
+    }
+  });
+
+  // Initial load
   loadProducts();
 });
 </script>

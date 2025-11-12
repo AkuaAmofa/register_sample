@@ -1,4 +1,3 @@
-<?php // view/single_product.php ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +10,7 @@
 <body class="bg-light">
 
   <div class="container py-5">
-    <!-- Updated path: now points to /view/all_product.php -->
-    <a href="all_product.php" class="btn btn-secondary mb-4">← Back to Products</a>
+    <a href="all_product.php" class="btn btn-secondary mb-4">Back to Products</a>
     <div id="productDetails" class="row justify-content-center"></div>
   </div>
 
@@ -24,6 +22,7 @@
       return;
     }
 
+    // Load single product
     $.getJSON('../actions/product_actions.php', { action: 'single', id }, function(p){
       if (!p || p.status === 'error') {
         $('#productDetails').html('<p class="text-muted">' + (p?.message || 'Product not found') + '</p>');
@@ -41,11 +40,39 @@
           <h4 class="text-success mb-3">GHS ${parseFloat(p.product_price).toFixed(2)}</h4>
           <p>${p.product_desc || ''}</p>
           <p><strong>Keywords:</strong> ${p.product_keywords || 'N/A'}</p>
-          <button class="btn btn-success">Add to Cart</button>
+          <button class="btn btn-success addToCart" data-id="${p.product_id}">Add to Cart</button>
         </div>`;
       $('#productDetails').html(html);
     }).fail(function(){
       $('#productDetails').html('<p class="text-danger">Error loading product details.</p>');
+    });
+
+    // Add to Cart event (redirect to cart on success)
+    $(document).on('click', '.addToCart', async function() {
+      const p_id = $(this).data('id');
+      if (!p_id) return alert('Invalid product ID');
+
+      try {
+        const res  = await fetch('../actions/cart_add_action.php', {
+          method: 'POST',
+          body: new URLSearchParams({ p_id, qty: 1 })
+        });
+
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch { return alert('Server returned non-JSON:\n' + text); }
+
+        if (data.status === 'success') {
+          // we are inside /view/, so this relative link is correct
+          window.location.href = 'cart.php?added=1';
+        } else {
+          alert(data.message || 'Error adding to cart.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Server error. Try again.');
+      }
     });
   });
   </script>
